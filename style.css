@@ -1,0 +1,14 @@
+svg text {
+    font: 8px Verdana;
+}
+
+svg path,
+line {
+    fill: none;
+    stroke: #333333;
+    width: 1px;
+}
+
+.table {
+    font: 8px Verdana;
+}
