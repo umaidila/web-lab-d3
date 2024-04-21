@@ -61,6 +61,18 @@ function drawGraph(data) {
     // значения по оси ОУ
     const isMin = data.oy[1].checked;
     const isMax = data.oy[0].checked;
+
+    if (!isMin && !isMax) {
+        d3.select("div.error-message")
+            .text("Выберите значение по оси ОУ")
+            .style("color", "red");
+        return
+    } else {
+        d3.select("div.error-message")
+            .text("")
+            .style("color", "black");
+    }
+
     // создаем массив для построения графика
     const arrGraph = createArrGraph(buildings, keyX);
     svg.selectAll('*').remove();
@@ -130,4 +142,9 @@ function createArrGraph(data, key) {
         arrGraph.push({ labelX: entry[0], values: minMax });
     }
     return arrGraph;
+}
+
+function readCsvFile(ticket){
+    const reader = new FileReader();
+    
 }
