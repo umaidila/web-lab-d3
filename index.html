@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-
+<HTML>
 <head>
     <meta charset="utf-8">
     <link rel="stylesheet" href="style.css">
@@ -12,8 +12,8 @@
     <div>
         <form>
             <p>Значение по оси OX</p>
-            <input type="radio" name="ox" value="Страна" checked>Цена<br>
-            <input type="radio" name="ox" value="Год">Объем<br>
+            <input type="radio" name="ox" value="Цена" checked>Цена<br>
+            <input type="radio" name="ox" value="Объем">Объем<br>
             <p>Значение по оси OY</p>
             <input type="checkbox" name="oy" value="Natural_Gas" checked>Природный газ<br>
             <input type="checkbox" name="oy" value="Crude_oil">Нефть<br>
@@ -36,13 +36,12 @@
             <input type="checkbox" name="oy" value="Gold">Золото<br>
             
 
-            <p>
-                <input type="file" id="fileInput" onchange="readCSVFile()">
-                <input type="button" id="submit" value="Построить" onclick="drawGraph(this.form)"/>
-                <div class="error-message"></div>
-            </p>
+            <input type="file" id="fileInput" onchange="readCSVFile()">
+            <input type="button" id="submit" value="Построить" onclick="drawGraph(this.form)"/>
+            <div class="error-message"></div>
+
         </form>
-        <svg  width="800" height="500"> </svg>
+        <svg> </svg>
     </div>
     <div class="table">
         <p>

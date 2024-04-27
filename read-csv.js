@@ -48,8 +48,8 @@ function csvToObject(csvString) {
 
     const items = {};  // Объект для хранения ItemInfo объектов по имени товара
 
-    lines.slice(1).forEach(line => {
-        const values = line.split(',');
+    lines.slice(1).forEach(valueLine => {
+        const values = parseCSVLine(valueLine);
         const date = values[headers.indexOf('Date')];  // Получаем дату из каждой строки
 
         headers.forEach((header, index) => {
@@ -79,3 +79,18 @@ function csvToObject(csvString) {
 
 
 
+function parseCSVLine(text) {
+    //                     "2,315.64" 
+    const regex = /(?:^|,)(?:"([^"]*)"|([^,]*))/g;
+    let result = [];
+    let match;
+
+    while (match = regex.exec(text)) {
+        if (match[1] !== undefined) { // Значение заключено в кавычки
+            result.push(match[1].replace(/,/g, ''));
+        } else { // Значение не заключено в кавычки
+            result.push(match[2]);
+        }
+    }
+    return result;
+}
