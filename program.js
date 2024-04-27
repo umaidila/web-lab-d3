@@ -27,8 +27,37 @@ let svg = d3.select("svg")
         ).filter(d => oyValues.includes(d.name));  // Фильтруем по выбранным категориям
     
         // Очищаем предыдущий график
-        svg.selectAll('*').remove();
+       // svg.selectAll('*').remove();
+
+        let range = d3.extent(formattedData, d => d.value);
+        let min = range[0];
+        let max = range[1];
+
+
+                // функция интерполяции значений на оси
+        let scaleX = d3.scaleBand()
+                    .domain(d3.extent(formattedData, d => d.day))
+                    .range([0, width - 2 * marginX]);
+        let scaleY = d3.scaleLinear()
+                    .domain([min * 0.85, max * 1.1 ])
+                    .range([height - 2 * marginY, 0]);
+        // создание осей
+        let axisX = d3.axisBottom(scaleX); // горизонтальная
+        let axisY = d3.axisLeft(scaleY); // вертикальная
     
+
+        // отрисовка осей в SVG-элементе
+        svg.append("g")
+        .attr("transform", `translate(${marginX}, ${height - marginY})`)
+            .call(axisX)
+            .selectAll("text") // подписи на оси - наклонные
+            .style("text-anchor", "end")
+            .attr("dx", "-.8em")
+            .attr("dy", ".15em")
+            .attr("transform", d => "rotate(-45)");
+        svg.append("g")
+            .attr("transform", `translate(${marginX}, ${marginY})`)
+            .call(axisY);
         // Создание шкалы X и Y
         const x = d3.scaleTime()
             .domain(d3.extent(formattedData, d => d.date))

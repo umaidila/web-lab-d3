@@ -4,12 +4,11 @@
     <meta charset="utf-8">
     <link rel="stylesheet" href="style.css">
     <script src="http://d3js.org/d3.v7.min.js"> </script>
-    <script src="read-csv.js"></script>
-    <script src="program.js"></script>
+
 </head>
 
 <body>
-    <h3>Список самых высоких зданий</h3>
+    <h3>Список цен на основные активы</h3>
     <div>
         <form>
             <p>Значение по оси OX</p>
@@ -38,12 +37,12 @@
             
 
             <p>
-                <input type="file" id="fileInput"> Выбрать файл и построить </input>
+                <input type="file" id="fileInput" onchange="readCSVFile()">
                 <input type="button" id="submit" value="Построить" onclick="drawGraph(this.form)"/>
                 <div class="error-message"></div>
             </p>
         </form>
-        <svg height=10> </svg>
+        <svg  width="800" height="500"> </svg>
     </div>
     <div class="table">
         <p>
@@ -56,3 +55,6 @@
     </div>
     
 </body>
+<script src="read-csv.js"></script>
+<script src="program.js"></script>
+</html>

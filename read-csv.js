@@ -21,13 +21,18 @@ class ItemInfo {
 let globalData = [];  // Глобальная переменная для хранения данных
 
 function readCSVFile() {
-
+    const input = document.getElementById('fileInput');
     const file = input.files[0];
+    if (!file) {
+        console.log("No file selected.");
+        return;
+    }
     const reader = new FileReader();
 
     reader.onload = function(event) {
         const text = event.target.result;
-        globalData = csvToObject(text);  // Update the global data object with processed data
+        globalData = csvToObject(text);
+        console.log("Data loaded successfully:", globalData);
     };
 
     reader.onerror = function() {
@@ -36,8 +41,8 @@ function readCSVFile() {
 
     reader.readAsText(file);
 }
-
 function csvToObject(csvString) {
+    console.log("csv string = ", csvString);
     const lines = csvString.trim().split('\n');
     const headers = lines[0].split(',');
 
@@ -48,23 +53,29 @@ function csvToObject(csvString) {
         const date = values[headers.indexOf('Date')];  // Получаем дату из каждой строки
 
         headers.forEach((header, index) => {
-            if (header.endsWith("_Price")) {
-                const name = header.split('_')[0];  // Извлекаем имя товара из заголовка
-                const price = values[index];  // Цена для данного товара
-                const volumeHeader = `${name}_Vol`;  // Создаем заголовок для объема
-                const volumeIndex = headers.indexOf(volumeHeader);
-                const volume = values[volumeIndex];  // Объем для данного товара
+            if (header.endsWith("_Price") || header.endsWith("_Vol")) {
+                const name_parts = header.split('_');
+                name_parts.pop();
+                const name = name_parts.join("_");  // Извлекаем имя товара из заголовка
+                const priceIndex = headers.indexOf(name + "_Price");
+                const volumeIndex = headers.indexOf(name + "_Vol.");
+
+                // Удаляем запятые и обрабатываем пустые строки
+                const price = values[priceIndex] ? parseFloat(values[priceIndex].replace(/,/g, '')) : null;
+                const volume = values[volumeIndex] ? parseFloat(values[volumeIndex].replace(/,/g, '')) : null;
 
                 if (!items[name]) {
                     items[name] = new ItemInfo(name);  // Создаем новый объект ItemInfo, если не существует
                 }
 
-                const dayInfo = new DayInfo(date, price, volume);  // Создаем объект DayInfo
-                items[name].addDayInfo(dayInfo);  // Добавляем DayInfo к соответствующему ItemInfo
+                const dayInfo = new DayInfo(date, price, volume);
+                items[name].addDayInfo(dayInfo);
             }
         });
     });
 
     return Object.values(items);  // Возвращаем массив всех ItemInfo объектов
 }
+
+
 
