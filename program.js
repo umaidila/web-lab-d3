@@ -15,7 +15,7 @@ function drawGraph(form, animate = False) {
     let svg = d3.select("svg")
             .attr("width", width + marginX * 2)  
             .attr("height", height + marginY * 2) 
-        .append("g") // g - graph
+        .append("g")
         .attr("transform", `translate(${marginX},${marginY})`);
 
 
@@ -123,7 +123,7 @@ d3.select("#showTable").on('click', function() {
         const selectedOyValues = Array.from(document.querySelectorAll('input[name="oy"]:checked')).map(d => d.value);
         const headers = ["Дата"].concat(selectedOyValues);
 
-        table.select("thead").append("tr")
+        const headerRow = table.select("thead").append("tr")
             .selectAll("th")
             .data(headers)
             .enter()
@@ -143,15 +143,42 @@ d3.select("#showTable").on('click', function() {
 
         const groupedData = d3.groups(tableData, d => d.date);
 
-        table.select("tbody").selectAll("tr")
-            .data(groupedData)
-            .enter()
-            .append("tr")
-            .each(function(d) {
-                d3.select(this).append("td").text(d[0]); // дата
-                d[1].forEach(val => {
-                    d3.select(this).append("td").text(val.value);
-                });
-            });
-    }
+        const rows = table.select("tbody").selectAll("tr")
+        .data(groupedData)
+        .enter()
+        .append("tr");
+
+        rows.selectAll("td")
+        .data(d => [d[0]].concat(d[1].map(dd => dd.value)))
+        .enter()
+        .append("td")
+        .text(d => d);
+
+    // Добавление обработчиков событий сортировки
+    headerRow.on("click", function(event, header) {
+        const columnIndex = headers.indexOf(header);
+        rows.sort((a, b) => {
+            if (columnIndex === 0) {
+                // Сравниваем даты как объекты Date
+                const dateA = parseDate(a[0]);
+                const dateB = parseDate(b[0]);
+                return d3.ascending(dateA, dateB);
+            } else {
+                const valueA = a[1][columnIndex - 1].value;
+                const valueB = b[1][columnIndex - 1].value;
+                return d3.ascending(valueA, valueB);
+            }
+        });
+
+        // Обновление строк после сортировки
+        rows.selectAll("td")
+            .data(d => [d[0]].concat(d[1].map(dd => dd.value)))
+            .text(d => d);
+    });
+}
 });
+
+function parseDate(dateStr) {
+    const parts = dateStr.split('-');
+    return new Date(parts[2], parts[1] - 1, parts[0]);
+}
