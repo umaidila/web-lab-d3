@@ -5,7 +5,11 @@ const width = 800;
 
 
 
-function drawGraph(form) {
+function drawGraph(form, animate = False) {
+    if (!globalData || globalData.length === 0) {
+        alert("Нужно выбрать файл");
+        return;
+    }
     d3.select("svg").selectAll("*").remove();
 
     let svg = d3.select("svg")
@@ -14,10 +18,9 @@ function drawGraph(form) {
         .append("g") // g - graph
         .attr("transform", `translate(${marginX},${marginY})`);
 
-    // Извлекаем информацию о выбранных параметрах для оси X и Y
 
     const colors = d3.scaleOrdinal(d3.schemeCategory10);
-    const isPriceSelected = form.ox.value === "Цена";  // Проверяем, выбрана ли цена или объем
+    const isPriceSelected = form.ox.value === "Цена";  
     const oyValues = Array.from(form.querySelectorAll('input[name="oy"]:checked')).map(checkbox => checkbox.value);
     
 
@@ -30,10 +33,9 @@ function drawGraph(form) {
             name: item.name,
             value: isPriceSelected ? info.price : info.volume
         }))
-    );  // Фильтруем по выбранным категориям
+    ); 
 
 
-     // Создание шкалы X и Y
     const scaleX = d3.scaleTime()
         .domain(d3.extent(formattedData, d => d.date))
         .range([0, width]);
@@ -53,20 +55,29 @@ function drawGraph(form) {
     svg.append("g")
         .call(axisY);
 
-  // Отрисовка линий для каждого выбранного типа данных
+
   oyValues.forEach((key, i) => {
       const lineData = formattedData.filter(d => d.name === key);
       console.log("color = ", colors(i));
       const line = d3.line()
           .x(d => scaleX(d.date))
-          .y(d => scaleY(d.value));  // Делает линии более гладкими
+          .y(d => scaleY(d.value));  
 
-      svg.append("path")
+      const path =svg.append("path")
           .datum(lineData)
           .attr("fill", "none")
           .attr("stroke", colors(i))
           .attr("stroke-width", 1.5)
           .attr("d", line);
+
+      if (animate) {
+        const totalLength = path.node().getTotalLength();
+        path.attr("stroke-dasharray", totalLength + " " + totalLength)
+            .attr("stroke-dashoffset", -totalLength)
+            .transition()
+            .duration(5000)
+            .attr("stroke-dashoffset", 0);
+      }
   });
 
   const legend = svg.selectAll(".legend")
@@ -89,3 +100,59 @@ legend.append("text")
     .text(d => d);
 
 }
+
+d3.select("#showTable").on('click', function() {
+    if (!globalData || globalData.length === 0) {
+        alert("Нужно выбрать файл");
+        return;
+    }
+    // создание таблицы
+    const table = d3.select("div.table")
+        .select("table")
+    const isTableVisible = table.style("display") !== "none";
+    const buttonText = isTableVisible ? "Показать таблицу" : "Скрыть таблицу";
+    d3.select(this).text(buttonText); 
+    table.style("display", isTableVisible ? "none" : "block"); // переключаем видимость
+
+
+    if (!isTableVisible) {
+
+        const isPriceSelected = d3.select('input[name="ox"]:checked').node().value === "Цена";
+
+        const selectedOyValues = Array.from(document.querySelectorAll('input[name="oy"]:checked')).map(d => d.value);
+        const headers = ["Дата"].concat(selectedOyValues);
+
+
+        table.select("thead").selectAll("*").remove();
+        table.select("tbody").selectAll("*").remove();
+
+        table.select("thead").append("tr")
+            .selectAll("th")
+            .data(headers)
+            .enter()
+            .append("th")
+            .text(d => d);
+
+
+        const tableData = globalData.flatMap(item => 
+            item.infoArray.map(info => ({
+                date: info.day,
+                name: item.name,
+                value: isPriceSelected ? info.price : info.volume
+            }))
+        );
+
+        const groupedData = d3.groups(tableData, d => d.date);
+
+        const rows = table.select("tbody").selectAll("tr")
+            .data(groupedData)
+            .enter()
+            .append("tr")
+            .each(function(d) {
+                d3.select(this).append("td").text(d[0]); // дата
+                d[1].forEach(val => {
+                    d3.select(this).append("td").text(val.value);
+                });
+            });
+    }
+});

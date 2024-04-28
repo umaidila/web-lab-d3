@@ -37,7 +37,8 @@
             
 
             <input type="file" id="fileInput" onchange="readCSVFile()">
-            <input type="button" id="submit" value="Построить" onclick="drawGraph(this.form)"/>
+            <input type="button" id="draw" value="Построить сразу" onclick="drawGraph(this.form, false)"/>
+            <input type="button" id="animateDraw" value="Построить с анимацией" onclick="drawGraph(this.form, true)"/>            
             <div class="error-message"></div>
 
         </form>
