@@ -86,9 +86,9 @@ function parseCSVLine(text) {
     let match;
 
     while (match = regex.exec(text)) {
-        if (match[1] !== undefined) { // Значение заключено в кавычки
+        if (match[1] !== undefined) { // если значение заключено в кавычки
             result.push(match[1].replace(/,/g, ''));
-        } else { // Значение не заключено в кавычки
+        } else { 
             result.push(match[2]);
         }
     }
