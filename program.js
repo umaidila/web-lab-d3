@@ -102,29 +102,26 @@ legend.append("text")
 }
 
 d3.select("#showTable").on('click', function() {
-    if (!globalData || globalData.length === 0) {
-        alert("Нужно выбрать файл");
-        return;
-    }
-    // создание таблицы
-    const table = d3.select("div.table")
-        .select("table")
-    const isTableVisible = table.style("display") !== "none";
-    const buttonText = isTableVisible ? "Показать таблицу" : "Скрыть таблицу";
-    d3.select(this).text(buttonText); 
-    table.style("display", isTableVisible ? "none" : "block"); // переключаем видимость
+    const table = d3.select("div.table").select("table");
+    const isTableFilled = !table.select("tbody").selectAll("tr").empty();
 
-
-    if (!isTableVisible) {
-
-        const isPriceSelected = d3.select('input[name="ox"]:checked').node().value === "Цена";
-
-        const selectedOyValues = Array.from(document.querySelectorAll('input[name="oy"]:checked')).map(d => d.value);
-        const headers = ["Дата"].concat(selectedOyValues);
-
-
+    // Переключаем видимость и обновляем текст кнопки
+    if (isTableFilled) {
         table.select("thead").selectAll("*").remove();
         table.select("tbody").selectAll("*").remove();
+        d3.select(this).text("Показать таблицу");
+    } else {
+        // Проверяем, есть ли данные
+        if (!globalData || globalData.length === 0) {
+            alert("Нужно выбрать файл");
+            return;
+        }
+        d3.select(this).text("Скрыть таблицу");
+
+        // Заполняем таблицу
+        const isPriceSelected = d3.select('input[name="ox"]:checked').node().value === "Цена";
+        const selectedOyValues = Array.from(document.querySelectorAll('input[name="oy"]:checked')).map(d => d.value);
+        const headers = ["Дата"].concat(selectedOyValues);
 
         table.select("thead").append("tr")
             .selectAll("th")
@@ -134,7 +131,9 @@ d3.select("#showTable").on('click', function() {
             .text(d => d);
 
 
-        const tableData = globalData.flatMap(item => 
+        const tableData = globalData
+        .filter(item => selectedOyValues.includes(item.name))
+        .flatMap(item => 
             item.infoArray.map(info => ({
                 date: info.day,
                 name: item.name,
@@ -144,7 +143,7 @@ d3.select("#showTable").on('click', function() {
 
         const groupedData = d3.groups(tableData, d => d.date);
 
-        const rows = table.select("tbody").selectAll("tr")
+        table.select("tbody").selectAll("tr")
             .data(groupedData)
             .enter()
             .append("tr")
