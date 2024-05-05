@@ -11,29 +11,37 @@
     <h3>Список цен на основные активы</h3>
     <div>
         <form>
-            <p>Значение по оси OX</p>
-            <input type="radio" name="ox" value="Цена" checked>Цена<br>
-            <input type="radio" name="ox" value="Объем">Объем<br>
-            <p>Значение по оси OY</p>
-            <input type="checkbox" name="oy" value="Natural_Gas" checked>Природный газ<br>
-            <input type="checkbox" name="oy" value="Crude_oil">Нефть<br>
-            <input type="checkbox" name="oy" value="Copper">Медь<br>
-            <input type="checkbox" name="oy" value="Bitcoin">Bitcoin<br>
-            <input type="checkbox" name="oy" value="Platinum">Платина<br>
-            <input type="checkbox" name="oy" value="Ethereum">Ethereum<br>
-            <input type="checkbox" name="oy" value="S&P_500">S&P 500<br>
-            <input type="checkbox" name="oy" value="Nasdaq_100">Nasdaq 100<br>
-            <input type="checkbox" name="oy" value="Apple">Apple<br>
-            <input type="checkbox" name="oy" value="Tesla">Tesla<br>
-            <input type="checkbox" name="oy" value="Microsoft">Microsoft<br>
-            <input type="checkbox" name="oy" value="Silver">Серебро<br>
-            <input type="checkbox" name="oy" value="Google">Google<br>
-            <input type="checkbox" name="oy" value="Nvidia">Nvidia<br>
-            <input type="checkbox" name="oy" value="Berkshire">Berkshire Hathaway<br>
-            <input type="checkbox" name="oy" value="Netflix">Netflix<br>
-            <input type="checkbox" name="oy" value="Amazon">Amazon<br>
-            <input type="checkbox" name="oy" value="Meta">Meta (Facebook)<br>
-            <input type="checkbox" name="oy" value="Gold">Золото<br>
+            <p>Выбрать категорию</p>
+            <input type="radio" name="priceSelectedMarker" value="min" checked>Минимальный<br>
+            <input type="radio" name="priceSelectedMarker" value="mean">Средний<br>
+            <input type="radio" name="priceSelectedMarker" value="max">Максимальный<br>
+            <p>Выберите группировку</p>
+            <input type="radio" name="groupSelect" value="week">Неделя<br>
+            <input type="radio" name="groupSelect" value="month" checked>Месяц<br>
+            <input type="radio" name="groupSelect" value="year">Год<br>
+            <p>Фильтр по времени</p>
+            <input type="date" name="startDate">
+            <input type="date" name="endDate">
+            <p>Выбранные товары</p>
+            <input type="checkbox" name="productSelect" value="Natural_Gas" checked>Природный газ<br>
+            <input type="checkbox" name="productSelect" value="Crude_oil">Нефть<br>
+            <input type="checkbox" name="productSelect" value="Copper">Медь<br>
+            <input type="checkbox" name="productSelect" value="Bitcoin">Bitcoin<br>
+            <input type="checkbox" name="productSelect" value="Platinum">Платина<br>
+            <input type="checkbox" name="productSelect" value="Ethereum">Ethereum<br>
+            <input type="checkbox" name="productSelect" value="S&P_500">S&P 500<br>
+            <input type="checkbox" name="productSelect" value="Nasdaq_100">Nasdaq 100<br>
+            <input type="checkbox" name="productSelect" value="Apple">Apple<br>
+            <input type="checkbox" name="productSelect" value="Tesla">Tesla<br>
+            <input type="checkbox" name="productSelect" value="Microsoft">Microsoft<br>
+            <input type="checkbox" name="productSelect" value="Silver">Серебро<br>
+            <input type="checkbox" name="productSelect" value="Google">Google<br>
+            <input type="checkbox" name="productSelect" value="Nvidia">Nvidia<br>
+            <input type="checkbox" name="productSelect" value="Berkshire">Berkshire Hathaway<br>
+            <input type="checkbox" name="productSelect" value="Netflix">Netflix<br>
+            <input type="checkbox" name="productSelect" value="Amazon">Amazon<br>
+            <input type="checkbox" name="productSelect" value="Meta">Meta (Facebook)<br>
+            <input type="checkbox" name="productSelect" value="Gold">Золото<br>
             
 
             <input type="file" id="fileInput" onchange="readCSVFile()">

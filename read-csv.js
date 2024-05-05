@@ -1,19 +1,11 @@
 class DayInfo {
-    constructor(day, price, volume) {
+    constructor(day) {
         this.day = day;
-        this.price = parseFloat(price) || null; // Преобразуем строку в число, если возможно
-        this.volume = parseFloat(volume) || null;
-    }
-}
-
-class ItemInfo {
-    constructor(name) {
-        this.name = name;
-        this.infoArray = [];
+        this.prices = {};  // Словарь для хранения цен: ключ - название компании, значение - цена
     }
 
-    addDayInfo(dayInfo) {
-        this.infoArray.push(dayInfo);
+    addPrice(name, price) {
+        this.prices[name] = price;  
     }
 }
 
@@ -42,39 +34,36 @@ function readCSVFile() {
     reader.readAsText(file);
 }
 function csvToObject(csvString) {
-    console.log("csv string = ", csvString);
     const lines = csvString.trim().split('\n');
     const headers = lines[0].split(',');
 
-    const items = {};  // Объект для хранения ItemInfo объектов по имени товара
+    const days = {};  // Объект для хранения массива DayInfo
 
     lines.slice(1).forEach(valueLine => {
         const values = parseCSVLine(valueLine);
         const date = values[headers.indexOf('Date')];  // Получаем дату из каждой строки
 
+
+        if (!days[date]) {
+            days[date] = new DayInfo(date);  // Создаем новый DayInfo для дня, если он еще не существует
+        }
+
         headers.forEach((header, index) => {
-            if (header.endsWith("_Price") || header.endsWith("_Vol")) {
+            if (header.endsWith("_Price") ) {
                 const name_parts = header.split('_');
                 name_parts.pop();
                 const name = name_parts.join("_");  // Извлекаем имя товара из заголовка
                 const priceIndex = headers.indexOf(name + "_Price");
-                const volumeIndex = headers.indexOf(name + "_Vol.");
 
                 // Удаляем запятые и обрабатываем пустые строки
                 const price = values[priceIndex] ? parseFloat(values[priceIndex].replace(/,/g, '')) : null;
-                const volume = values[volumeIndex] ? parseFloat(values[volumeIndex].replace(/,/g, '')) : null;
-
-                if (!items[name]) {
-                    items[name] = new ItemInfo(name);  // Создаем новый объект ItemInfo, если не существует
-                }
-
-                const dayInfo = new DayInfo(date, price, volume);
-                items[name].addDayInfo(dayInfo);
+               
+                days[date].addPrice(name, price);
             }
         });
     });
 
-    return Object.values(items);  // Возвращаем массив всех ItemInfo объектов
+    return Object.values(days);  // Возвращаем массив всех ItemInfo объектов
 }
 
 
