@@ -11,3 +11,23 @@ line {
 .table {
     font: 8px Verdana;
 }
+
+th.asc::after {
+    content: " ▲1";
+    font-size: 0.75em;
+}
+
+th.desc::after {
+    content: " ▼1";
+    font-size: 0.75em;
+}
+
+th.asc2::after {
+    content: " ▲2";
+    font-size: 0.75em;
+}
+
+th.desc2::after {
+    content: " ▼2";
+    font-size: 0.75em;
+}

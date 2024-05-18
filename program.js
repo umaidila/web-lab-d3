@@ -5,7 +5,7 @@ const width = 800;
 // групировка по месяцам, группировка по кварталам, группировка по годам
 // выбирать максимальный, минимальный, средний
 // фильтры по времени
-// многоуровневая сортировка (тогда надо отбрасывать дроби)
+// многоуровневая сортировка 
 
 function drawGraph(form, animate = false) {
     if (!globalData || globalData.length === 0) {
@@ -140,26 +140,53 @@ d3.select("#showTable").on('click', function () {
             .append("th")
             .text(d => d)
             .on("click", function (event, header) {
-                const sortAscending = !d3.select(this).classed("asc");
-                d3.selectAll("th").classed("asc desc", false);
-                d3.select(this).classed(sortAscending ? "asc" : "desc", true);
-
                 const key = header.toLowerCase();
+                const isPrimary = d3.select(this).classed("asc") || d3.select(this).classed("desc");
+                const isSecondary = d3.select(this).classed("asc2") || d3.select(this).classed("desc2");
+
+                if (isPrimary) {
+                    const ascending = d3.select(this).classed("asc");
+                    d3.select(this).classed("asc", !ascending).classed("desc", ascending);
+                } else if (isSecondary) {
+                    resetSecondarySort();
+                    const currentPrimary = d3.selectAll("th.asc, th.desc").nodes()[0];
+                    if (currentPrimary) {
+                        d3.select(currentPrimary).classed("asc2", d3.select(currentPrimary).classed("asc"))
+                            .classed("desc2", d3.select(currentPrimary).classed("desc"))
+                            .classed("asc desc", false);
+                    }
+                    d3.select(this).classed("asc", true);
+                } else {
+                    if (d3.selectAll("th.asc, th.desc").empty()) {
+                        d3.select(this).classed("asc", true);
+                    } else {
+                        resetSecondarySort();
+                        const currentPrimary = d3.selectAll("th.asc, th.desc").nodes()[0];
+                        if (currentPrimary) {
+                            d3.select(currentPrimary).classed("asc2", d3.select(currentPrimary).classed("asc"))
+                                .classed("desc2", d3.select(currentPrimary).classed("desc"))
+                                .classed("asc desc", false);
+                        }
+                        d3.select(this).classed("asc", true);
+                    }
+                }
+
                 const rows = table.select("tbody").selectAll("tr");
                 rows.sort((a, b) => {
-                    if (key === "дата") {
-                        return sortAscending ? d3.ascending(parseDateWithDots(a.date), parseDateWithDots(b.date)) :
-                            d3.descending(parseDateWithDots(a.date), parseDateWithDots(b.date));
-                    } else if (key === "цена") {
-                        return sortAscending ? d3.ascending(parseFloat(a.value), parseFloat(b.value)) :
-                            d3.descending(parseFloat(a.value), parseFloat(b.value));
+                    const primaryHeader = d3.selectAll("th.asc, th.desc").data()[0].toLowerCase();
+                    const primaryOrder = d3.selectAll("th.asc").size() > 0;
+                    const primaryComparison = compare(a, b, primaryHeader, primaryOrder);
+                    if (primaryComparison !== 0 || d3.selectAll("th.asc2, th.desc2").empty()) {
+                        return primaryComparison;
                     } else {
-                        return sortAscending ? d3.ascending(a.name, b.name) : d3.descending(a.name, b.name);
+                        const secondaryHeader = d3.selectAll("th.asc2, th.desc2").data()[0].toLowerCase();
+                        const secondaryOrder = d3.selectAll("th.asc2").size() > 0;
+                        return compare(a, b, secondaryHeader, secondaryOrder);
                     }
                 });
             });
 
-        updateTable();  // Первоначальное заполнение таблицы
+        updateTable(); // Первоначальное заполнение таблицы
 
         function updateTable() {
             const rowData = aggregatedData.flatMap(item =>
@@ -181,14 +208,33 @@ d3.select("#showTable").on('click', function () {
                 .append("td")
                 .text(d => d);
         }
+
+        function resetSecondarySort() {
+            d3.selectAll("th").classed("asc2 desc2", false);
+        }
+        
     }
 });
+
+function compare(a, b, key, ascending) {
+    if (key === "дата") {
+        const dateA = parseDateWithDots(a.date);
+        const dateB = parseDateWithDots(b.date);
+        return ascending ? d3.ascending(dateA, dateB) : d3.descending(dateA, dateB);
+    } else if (key === "цена") {
+        const valueA = parseFloat(a.value);
+        const valueB = parseFloat(b.value);
+        return ascending ? d3.ascending(valueA, valueB) : d3.descending(valueA, valueB);
+    } else {
+        return ascending ? d3.ascending(a.name, b.name) : d3.descending(a.name, b.name);
+    }
+}
+
 
 function parseDateWithDots(dateStr) {
     const parts = dateStr.split('.');
     return new Date(parts[2], parts[1] - 1, parts[0]);
 }
-
 
 
 
